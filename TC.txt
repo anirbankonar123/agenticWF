@@ -1,0 +1,131 @@
+
+{
+  "testCases": [
+    {
+      "userStory": "As a NATO end user, I want to be able to search for information products on both the Operational Network (ON) and the Protected Business Network (PBN) so that I can find the information I need regardless of the network I am using.",
+      "description": "Users should be able to search for information products, including documents, articles, events, and other relevant items, using a consistent search interface and functionality across both ON and PBN. The search should consider the user's access rights and only display results they are authorized to view.",
+      "acceptanceCriteria": [
+        "The search functionality is accessible from both ON and PBN.",
+        "The search interface is consistent across both networks.",
+        "Users can search for information products using keywords, metadata, and filters.",
+        "Search results are displayed according to the user's access rights.",
+        "The search functionality meets the defined performance requirements (e.g., response time).",
+        "Existing NIP, EDMS, TT+ search functionality is preserved."
+      ],
+      "testCases": [
+        {
+          "testCaseID": "TC001",
+          "description": "Verify that the search functionality is accessible from ON.",
+          "type": "Positive",
+          "pre-requisites": "User is authenticated and has access to the ON.",
+          "expectedOutcome": "Search functionality loads successfully."
+        },
+        {
+          "testCaseID": "TC002",
+          "description": "Verify that the search functionality is accessible from PBN.",
+          "type": "Positive",
+          "pre-requisites": "User is authenticated and has access to the PBN.",
+          "expectedOutcome": "Search functionality loads successfully."
+        },
+        {
+          "testCaseID": "TC003",
+          "description": "Verify that the search interface is consistent across ON and PBN.",
+          "type": "Positive",
+          "pre-requisites": "User is authenticated and has access to both networks.",
+          "expectedOutcome": "Search interface elements (buttons, fields) are identical across both networks."
+        },
+        {
+          "testCaseID": "TC004",
+          "description": "User can search for information products using keywords.",
+          "type": "Positive",
+          "pre-requisites": "User is authenticated and uses a valid keyword.",
+          "expectedOutcome": "Appropriate search results are displayed based on the keyword."
+        },
+        {
+          "testCaseID": "TC005",
+          "description": "User can search for information products using metadata.",
+          "type": "Positive",
+          "pre-requisites": "User is authenticated and knows valid metadata parameters.",
+          "expectedOutcome": "Appropriate search results are displayed based on metadata."
+        },
+        {
+          "testCaseID": "TC006",
+          "description": "User can apply filters during the search.",
+          "type": "Positive",
+          "pre-requisites": "User is authenticated and familiar with available filters.",
+          "expectedOutcome": "Search results adjust according to the applied filters."
+        },
+        {
+          "testCaseID": "TC007",
+          "description": "Ensure that search results are displayed according to the user's access rights.",
+          "type": "Positive",
+          "pre-requisites": "User has access rights based on roles.",
+          "expectedOutcome": "Only authorized results are displayed based on user permissions."
+        },
+        {
+          "testCaseID": "TC008",
+          "description": "Verify that search functionality meets performance requirements.",
+          "type": "Non-Functional",
+          "pre-requisites": "User initiates a search operation.",
+          "expectedOutcome": "Search results display within 3 seconds."
+        },
+        {
+          "testCaseID": "TC009",
+          "description": "Ensure existing NIP, EDMS, TT+ search functionality is preserved.",
+          "type": "Positive",
+          "pre-requisites": "User is authenticated and tests existing functionalities.",
+          "expectedOutcome": "Existing functionalities return correct results as expected."
+        },
+        {
+          "testCaseID": "TC010",
+          "description": "Verify accessibility of search functionality without authentication on ON.",
+          "type": "Negative",
+          "pre-requisites": "User is not authenticated.",
+          "expectedOutcome": "Access denied or error message is displayed."
+        },
+        {
+          "testCaseID": "TC011",
+          "description": "Verify accessibility of search functionality without authentication on PBN.",
+          "type": "Negative",
+          "pre-requisites": "User is not authenticated.",
+          "expectedOutcome": "Access denied or error message is displayed."
+        },
+        {
+          "testCaseID": "TC012",
+          "description": "Attempt to search using an invalid keyword.",
+          "type": "Negative",
+          "pre-requisites": "User is authenticated using an invalid keyword.",
+          "expectedOutcome": "Error message or no results found."
+        },
+        {
+          "testCaseID": "TC013",
+          "description": "Search with filters that yield no results.",
+          "type": "Negative",
+          "pre-requisites": "User is authenticated and applies filters with no matching records.",
+          "expectedOutcome": "Message indicating no results found."
+        },
+        {
+          "testCaseID": "TC014",
+          "description": "Check user access to restricted results.",
+          "type": "Negative",
+          "pre-requisites": "User tries to search for information products they do not have access rights for.",
+          "expectedOutcome": "Restricted results should not be displayed."
+        },
+        {
+          "testCaseID": "TC015",
+          "description": "Verify that the search interface does not crash with unexpected input.",
+          "type": "Negative",
+          "pre-requisites": "User inputs unexpected characters (e.g., special chars).",
+          "expectedOutcome": "Search interface remains functional and provides a user-friendly error message."
+        },
+        {
+          "testCaseID": "TC016",
+          "description": "Measure response time during peak load conditions.",
+          "type": "Non-Functional",
+          "pre-requisites": "Simulate multiple concurrent users performing searches.",
+          "expectedOutcome": "Response time should not exceed 5 seconds, even under load."
+        }
+      ]
+    }
+  ]
+}
