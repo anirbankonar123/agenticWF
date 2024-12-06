@@ -18,17 +18,30 @@ class AgentState(TypedDict):
 
 
 from langchain_openai import ChatOpenAI
-model = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+model = ChatOpenAI(model="gpt-3.5-turbo", temperature=1.0)
 
 PLAN_PROMPT = """You are an expert Quality Assurance person tasked with writing Test cases from User stories. \
-Write the Test cases following "SMART" paradigm. \
+Write the Test cases following "SMART" paradigm. 
+Utilize all the information below as needed: \
+
+------
+
+User Story: {userstory}
+Description: {description}
+Acceptance Criteria: {acceptancecriteria}\
 ."""
 
 WRITER_PROMPT = """You are an expert Quality Assurance person tasked with writing Test cases from User Stories.\
-Generate Test cases for each Acceptance criteria and from the Description \
+Generate Test cases for each Acceptance criteria and from the Description of User Story\
+Each Test case should have Test steps, Expected results and pre-requisites.\
 Include non-functional test cases, as needed. \
-Include positive and negative Test cases in the ratio 70:30.\
-Utilize all the information below as needed: 
+Include positive and negative Test cases .\
+Identify negative test cases with Test case type field.\
+Do not generate more than three negative Test cases .\
+Generate Test cases in strict JSON format.\
+Include Test Case IDs in each Test case for easy Readability.\
+Generate 10 Test cases at the minimum.\
+Utilize all the information below as needed: \
 
 ------
 
@@ -41,32 +54,47 @@ Generate critique and recommendations for the Test cases. \
 Provide detailed recommendations, including positive, negative scenarios, non-functional cases."""
 
 
-from langchain_core.pydantic_v1 import BaseModel
+def getUserStory(reqmnt_id):
+    userstory=""
+    description=""
+    acceptancecriteria=""
+    file1 = open("US_4.txt", "r")
+    str = file1.read()
+    #str = str[7:-4]
+    json_list = []
+    json_list.append(json.loads(str))
 
-class Queries(BaseModel):
-    queries: List[str]
+    #print(len(json_list[0]))
+    for item in json_list[0]:
+        #print(item['RequirementID'])
+        if (item['RequirementID']==reqmnt_id):
+            userstory = item['UserStory']
+            description = item["Description"]
+            acceptancecriteria = item["AcceptanceCriteria"]
+
+    return userstory,description,acceptancecriteria
 
 def plan_node(state: AgentState):
+    userstory, description, acceptancecriteria = getUserStory("IKM-SRS-45")
+    print("USER STORY INPUT:")
+    print(userstory)
     messages = [
-        SystemMessage(content=PLAN_PROMPT),
+        SystemMessage(content=PLAN_PROMPT.format(userstory=userstory,description=description,acceptancecriteria=acceptancecriteria)),
         HumanMessage(content=state['task'])
     ]
     response = model.invoke(messages)
     return {"plan": response.content}
 
+
+
 def generation_node(state: AgentState):
     content = "\n\n".join(state['content'] or [])
     user_message = HumanMessage(
         content=f"{state['task']}\n\nHere is my plan:\n\n{state['plan']}")
-    file1 = open("MyFile.txt", "r")
-    str = file1.read()
-    str = str[7:-4]
-    json_list = []
-    json_list.append(json.loads(str))
 
-    userstory=json_list[0][5]['UserStory']
-    description=json_list[0][5]['Description']
-    acceptancecriteria=json_list[0][5]['AcceptanceCriteria']
+    userstory, description, acceptancecriteria = getUserStory("IKM-SRS-45")
+    print("USER STORY INPUT:")
+    print(userstory)
 
     messages = [
         SystemMessage(
@@ -112,13 +140,20 @@ builder.add_edge("reflect", "generate")
 
 graph = builder.compile(checkpointer=memory)
 
+file1 = open("TC_langgraph_8.txt", "w")
+
+output={}
 thread = {"configurable": {"thread_id": "1"}}
 for s in graph.stream({
-    'task': "generate Test cases from the User stories",
-    "max_revisions": 2,
+    'task': "generate Test cases from the given User story",
+    "max_revisions": 3,
     "revision_number": 1,
 }, thread):
     print(s)
+    output.update(s)
+
+file1.write(json.dumps(output))
+file1.close()
 
 
 
